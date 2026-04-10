@@ -1,0 +1,29 @@
+name: CI Pipeline - Controle de Safra
+
+# Executa o fluxo toda vez que houver um push ou pull request na branch principal
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # O robô usará o Linux mais recente
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar ambiente Java (JDK 17)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: 🔍 Executar Linting / Análise Estática (Checkstyle)
+        run: mvn checkstyle:check
+
+      - name: ✅ Executar Testes Automatizados (JUnit)
+        run: mvn test
