@@ -23,7 +23,7 @@ import java.util.Optional;
 public class AgroApiService {
 
   private static final String BASE_URL =
-      "https://api.cnptia.embrapa.br/agritec/v1/culturas";
+      "https://api.cnptia.embrapa.br/agritec/v2/culturas";
   private static final int TIMEOUT_SECONDS = 10;
 
   private final HttpClient httpClient;
@@ -86,6 +86,12 @@ public class AgroApiService {
       if (response.statusCode() == 200) {
         CicloColheitaDto dto = objectMapper.readValue(
             response.body(), CicloColheitaDto.class);
+
+        if (dto.diasParaColheita() <= 0) {
+          System.out.println("⚠️  A API não possui o tempo de colheita exato para essa cultura. Usando fallback manual.");
+          return Optional.empty();
+        }
+
         return Optional.of(dto.diasParaColheita());
       } else {
         System.out.println("⚠️  API retornou status "
